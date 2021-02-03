@@ -11,9 +11,11 @@ bot = Discordrb::Commands::CommandBot.new(
   prefix: '!'
 )
 
+channels = ENV['R2D2_CHANNELS'].split(',').map(&:to_i)
+
 RS_LEVELS.each do |level|
   bot.command "rs#{level}".to_sym do |event, *args|
-    RedStarCoordinator.call(event, level, *args)
+    RedStarCoordinator.call(event, level, *args) if channels.include?(event.channel.id)
   end
 end
 

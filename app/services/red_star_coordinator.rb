@@ -33,13 +33,12 @@ class RedStarCoordinator
       go
     when 'status'
       status
-    when 'clear'
+    when 'clear', 'cancel'
       clear
     end
   end
 
   def join
-    puts
     add_attendee
     delete_last_message
     if attendees.count >= 4
