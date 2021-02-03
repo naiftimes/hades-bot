@@ -3,7 +3,7 @@ require 'discordrb'
 
 require_relative 'app/services/red_star_coordinator'
 
-RS_LEVELS = 1..11
+RS_LEVELS = 4..11
 
 bot = Discordrb::Commands::CommandBot.new(
   token: ENV['R2D2_TOKEN'],

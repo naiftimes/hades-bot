@@ -180,7 +180,7 @@ private
 
   def thumbnail
     Discordrb::Webhooks::EmbedThumbnail.new(
-      url: 'https://cdn.discordapp.com/attachments/767039274255777822/806638064566009887/rss11_1.png'
+      url: "https://raw.githubusercontent.com/wamonroe/hades-bot/main/app/images/rs#{level}.png"
     )
   end
 
