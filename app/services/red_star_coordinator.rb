@@ -99,7 +99,7 @@ private
 
   def send_status_message
     message = event.send_embed do |embed|
-      embed.color = '#FF0000'
+      embed.color = '#9D2000'
       embed.title = "Red Star #{level}"
       embed.thumbnail = thumbnail
       embed.description = "Type `!rs#{level}` to join the queue"
@@ -113,7 +113,7 @@ private
 
   def send_go_message
     event.send_embed do |embed|
-      embed.color = '#FF0000'
+      embed.color = '#9D2000'
       embed.title = "Red Star #{level} GO!"
       embed.thumbnail = thumbnail
       embed.description = GO_MESSAGES.sample
