@@ -34,6 +34,8 @@ class RedStarCoordinator
       status
     when 'clear', 'cancel'
       clear
+    when 'help'
+      help
     end
   end
 
@@ -73,6 +75,15 @@ class RedStarCoordinator
     delete_last_message
     send_clear_message
     reset_attendees
+  end
+
+  def help
+    event << "__Red Star #{level} Help__"
+    event << "`!rs#{level}` Join the queue (auto-starts when the 4th attendee joins)."
+    event << "`!rs#{level} leave` Leave the queue."
+    event << "`!rs#{level} go` Start with less than 4 attendees."
+    event << "`!rs#{level} status` Status of the queue."
+    event << "`!rs#{level} cancel` Cancel the queue."
   end
 
   class << self
