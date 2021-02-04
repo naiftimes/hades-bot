@@ -4,6 +4,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '3.0.0'
 
 gem 'discordrb'
+gem 'redis'
 
 group :development do
   gem 'rubocop'

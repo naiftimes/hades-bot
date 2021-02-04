@@ -1,5 +1,5 @@
 class RedStarCoordinator
-  attr_reader :event, :level, :bot, :role, :args
+  attr_reader :redis, :event, :level, :args
 
   GO_MESSAGES = [
     "Oh no, I smell Turnip's voodoo on this one.",
@@ -15,11 +15,10 @@ class RedStarCoordinator
     'Turnip looks like a hobbit IRL.'
   ].freeze
 
-  def initialize(event, level, *args)
+  def initialize(redis, event, level, *args)
+    @redis = redis
     @event = event
     @level = level
-    @bot = event.server.bot
-    @role = event.server.roles.find { |role| role.name == "RS#{level}" }
     @args = args
   end
 
@@ -77,88 +76,15 @@ class RedStarCoordinator
   end
 
   class << self
-    def call(event, level, *args)
-      new(event, level, *args).call
-    end
-
-    def queue
-      @queue ||= {}
-    end
-
-    def attendees(level)
-      queue[level] ||= []
-    end
-
-    def add_attendee(level, user)
-      attendees(level) << user unless attendees(level).include?(user)
-    end
-
-    def remove_attendee(level, user)
-      attendees(level).delete(user)
-    end
-
-    def reset_attendees(level)
-      queue[level] = []
-      nil
-    end
-
-    def messages
-      @messages ||= {}
-    end
-
-    def message(level)
-      messages[level]
-    end
-
-    def store_message(level, message)
-      messages[level] = message
-    end
-
-    def remove_message(level)
-      messages.delete(level)
+    def call(redis, event, level, *args)
+      new(redis, event, level, *args).call
     end
   end
 
 private
 
-  def attendees
-    self.class.attendees(level)
-  end
-
-  def add_attendee
-    self.class.add_attendee(level, event.user.mention)
-  end
-
-  def remove_attendee
-    self.class.remove_attendee(level, event.user.mention)
-  end
-
-  def reset_attendees
-    self.class.reset_attendees(level)
-  end
-
-  def store_message(message)
-    self.class.store_message(level, message)
-  end
-
-  def delete_last_message
-    return unless (message = self.class.message(level))
-
-    message.delete
-    self.class.remove_message(level)
-  end
-
-  def send_go_message
-    event.send_embed do |embed|
-      embed.color = '#FF0000'
-      embed.title = "Red Star #{level} GO!"
-      embed.thumbnail = thumbnail
-      embed.description = GO_MESSAGES.sample
-      embed.fields << attendees_field
-      embed.footer = footer
-    end
-    # event << "#{attendees.join(', ')} RS#{level} is a go!"
-  end
+  # MESSAGES
+  ##
 
   def send_status_message
     message = event.send_embed do |embed|
@@ -174,9 +100,23 @@ private
     store_message(message)
   end
 
+  def send_go_message
+    event.send_embed do |embed|
+      embed.color = '#FF0000'
+      embed.title = "Red Star #{level} GO!"
+      embed.thumbnail = thumbnail
+      embed.description = GO_MESSAGES.sample
+      embed.fields << attendees_field
+      embed.footer = footer
+    end
+  end
+
   def send_clear_message
     event << "Queue cleared for RS#{level}"
   end
+
+  # MESSAGE PARTS
+  ##
 
   def thumbnail
     Discordrb::Webhooks::EmbedThumbnail.new(
@@ -213,5 +153,73 @@ private
       text: 'Powered by R2D2 | 4 ABY',
       icon_url: bot.avatar_url
     )
+  end
+
+  # PERSISTENCE
+  ##
+
+  def redis_key(name)
+    "rs#{level}_#{name}"
+  end
+
+  def attendees
+    if (raw = redis.get redis_key(:attendees))
+      JSON.parse(raw)
+    else
+      []
+    end
+  rescue StandardError
+    []
+  end
+
+  def add_attendee
+    return if attendees.include? user
+
+    redis.set redis_key(:attendees), (attendees + [user]).to_json
+    nil
+  end
+
+  def remove_attendee
+    return unless attendees.include? user
+
+    redis.set redis_key(:attendees), (attendees - [user]).to_json
+    nil
+  end
+
+  def reset_attendees
+    redis.set redis_key(:attendees), [].to_json
+    nil
+  end
+
+  def last_message_id
+    redis.get redis_key(:last_message_id)
+  end
+
+  def store_message(message)
+    redis.set redis_key(:last_message_id), message.id
+    nil
+  end
+
+  def delete_last_message
+    return unless last_message_id
+
+    event.channel.delete_message(last_message_id)
+    redis.del redis_key(:last_message_id)
+    nil
+  end
+
+  # HELPERS
+  ##
+
+  def bot
+    @bot ||= event.server.bot
+  end
+
+  def role
+    @role ||= event.server.roles.find { |role| role.name == "RS#{level}" }
+  end
+
+  def user
+    @user ||= event.user.mention
   end
 end
