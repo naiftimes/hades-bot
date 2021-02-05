@@ -14,7 +14,7 @@ redis = Redis.new(
 bot = Discordrb::Commands::CommandBot.new(
   token: ENV['R2D2_TOKEN'],
   client_id: ENV['R2D2_CLIENT_ID'],
-  prefix: '!'
+  prefix: ENV.fetch('R2D2_PREFIX', '!')
 )
 
 rs_channels = ENV['R2D2_RS_CHANNELS'].split(',').map(&:to_i)
@@ -26,12 +26,12 @@ RS_LEVELS.each do |level|
 
     RedStarCoordinator.call(redis, event, level, *args)
   end
+end
 
-  bot.command :turnip do |event|
-    break unless fun_channels.include?(event.channel.id)
+bot.command :turnip do |event|
+  break unless fun_channels.include?(event.channel.id)
 
-    event << Faker::Quote.most_interesting_man_in_the_world
-  end
+  event << Faker::Quote.most_interesting_man_in_the_world
 end
 
 bot.run

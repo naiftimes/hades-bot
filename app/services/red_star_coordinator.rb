@@ -208,7 +208,7 @@ private
 
   def store_message(message)
     redis.set redis_key(:last_message_id), message.id
-    nil
+    message
   end
 
   def delete_last_message
