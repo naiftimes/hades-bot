@@ -41,6 +41,7 @@ class RedStarCoordinator
 
   def join
     add_attendee
+    delete_last_message
     if attendees.count >= 4
       send_go_message
       reset_attendees
@@ -51,6 +52,7 @@ class RedStarCoordinator
 
   def leave
     remove_attendee
+    delete_last_message
     if attendees.count.positive?
       send_status_message
     else
@@ -59,15 +61,18 @@ class RedStarCoordinator
   end
 
   def go
+    delete_last_message
     send_go_message
     reset_attendees
   end
 
   def status
+    delete_last_message
     send_status_message
   end
 
   def clear
+    delete_last_message
     send_clear_message
     reset_attendees
   end
@@ -93,7 +98,7 @@ private
   ##
 
   def send_status_message
-    event.send_embed do |embed|
+    message = event.send_embed do |embed|
       embed.color = '#9D2000'
       embed.title = "Red Star #{level}"
       embed.thumbnail = thumbnail
@@ -103,6 +108,7 @@ private
       embed.fields << invited_field
       embed.footer = footer
     end
+    store_message(message)
   end
 
   def send_go_message
@@ -193,6 +199,23 @@ private
 
   def reset_attendees
     redis.set redis_key(:attendees), [].to_json
+    nil
+  end
+
+  def last_message_id
+    redis.get redis_key(:last_message_id)
+  end
+
+  def store_message(message)
+    redis.set redis_key(:last_message_id), message.id
+    nil
+  end
+
+  def delete_last_message
+    return unless last_message_id
+
+    event.channel.delete_message(last_message_id)
+    redis.del redis_key(:last_message_id)
     nil
   end
 
