@@ -1,0 +1,2 @@
+srv: docker-compose up
+worker: bundle exec ruby bot.rb

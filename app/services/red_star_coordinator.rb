@@ -130,8 +130,10 @@ private
   ##
 
   def thumbnail
+    url = ENV.fetch('R2D2_IMAGES_URL', 'https://raw.githubusercontent.com/wamonroe/hades-bot/main/app/images')
+             .delete_prefix('/')
     Discordrb::Webhooks::EmbedThumbnail.new(
-      url: "https://raw.githubusercontent.com/naiftimes/hades-bot/main/app/images/rs#{level}.png"
+      url: "#{url}/rs#{level}.png"
     )
   end
 
