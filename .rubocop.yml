@@ -19,7 +19,7 @@ Metrics/AbcSize:
 
 Metrics/BlockLength:
   Max: 50
-  ExcludedMethods:
+  IgnoredMethods:
     - included
     - class_methods
     - run_callbacks
@@ -27,7 +27,7 @@ Metrics/BlockLength:
 Metrics/ClassLength:
   Max: 200
   Exclude:
-    - 'test/**/*_test.rb'
+    - "test/**/*_test.rb"
 
 Metrics/CyclomaticComplexity:
   Max: 12
@@ -40,6 +40,9 @@ Metrics/ModuleLength:
 
 Metrics/PerceivedComplexity:
   Max: 14
+
+Style/Documentation:
+  Enabled: false
 
 Style/FrozenStringLiteralComment:
   Enabled: false
