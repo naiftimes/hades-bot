@@ -20,3 +20,33 @@ the configuration done inside the source or (in a few instances) set via environ
 heroku login
 heroku scale worker=1 --app <app name here>
 ```
+
+## Creating a Discord Application
+
+1. Head over to the [Discord Developer Portal](https://discord.com/developers/applications), sign up for free account
+   if you haven't already.
+2. Click New Application
+3. Give it a Name and click **Create**
+
+## Create a Bot
+
+1. Head over to the [Discord Developer Portal](https://discord.com/developers/applications)
+2. Select the application created for the bot above
+3. Select **Bot** under SETTINGS
+4. Click **Add Bot** and then **Yes, do it!**
+
+## Getting an Client ID and Token
+
+1. Head over to the [Discord Developer Portal](https://discord.com/developers/applications)
+2. Select the application created for the bot above
+3. Select **OAuth2** under SETTINGS and click **Copy** under Client information > CLIENT ID.
+4. Select **Bot** under SETTINGS and click **Copy** Under Build-A-Bot > TOKEN.
+
+## Adding Bot to your Server
+
+1. Head over to the [Discord Permissions Calculator](https://discordapi.com/permissions.html#19456)
+2. For **Client ID**, paste the Client ID from above
+3. Click the resulting URL
+4. Select the server to add the bot to and click **Continue**
+5. Confirm the permissions (should be Read Messages, Send Messages, and Embed Links) and click **Authorize**
+6. Ensure that the Bot has permissions to the RS and Fun channels defined in the Config Vars
